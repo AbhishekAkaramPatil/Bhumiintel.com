@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BhumiIntel - Earth Intelligence for the real World</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066FF;
+            --primary-dark: #0052CC;
+            --secondary: #00D9FF;
+            --dark: #0A0E27;
+            --dark-light: #1A1F3A;
+            --text: #E8E9ED;
+            --text-muted: #9CA3AF;
+            --accent: #7C3AED;
+            --gold: #F5A623;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+            white-space: nowrap;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        #globe-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.4;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            padding: 0.4rem 1rem;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 20px;
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff, var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 720px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 102, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            padding: 1rem 2.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Stats Section */
+        .stats {
+            background: var(--dark-light);
+            padding: 4rem 2rem;
+            margin-top: -2rem;
+            position: relative;
+            z-index: 20;
+        }
+
+        .stats-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 3rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* Generic Section Header */
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-tag {
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-description {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        /* Solutions / Product grid */
+        .solutions {
+            padding: 6rem 2rem;
+            background: var(--dark);
+        }
+
+        .solutions-alt {
+            background: var(--dark-light);
+        }
+
+        .solutions-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2rem;
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .solution-card {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.8), rgba(26, 31, 58, 0.4));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .solution-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .solution-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .solution-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 102, 255, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 102, 255, 0.2);
+        }
+
+        .solution-icon-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .solution-icon-emoji {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+
+        .solution-card h3 {
+            font-size: 1.6rem;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .solution-card .card-kicker {
+            display: inline-block;
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 0.75rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .solution-card p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .solution-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .solution-features li {
+            padding: 0.5rem 0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .solution-features li::before {
+            content: '✓';
+            color: var(--secondary);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .learn-more {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: gap 0.3s;
+            margin-top: auto;
+        }
+
+        .learn-more:hover {
+            gap: 1rem;
+        }
+
+        /* Data layer table-style cards */
+        .data-grid {
+            max-width: 1400px;
+            margin: 3rem auto 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .data-dept-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 1.75rem;
+            transition: all 0.3s;
+        }
+
+        .data-dept-card:hover {
+            background: rgba(0, 102, 255, 0.06);
+            border-color: rgba(0, 102, 255, 0.4);
+            transform: translateY(-4px);
+        }
+
+        .data-dept-card .dept-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .data-dept-card h4 {
+            font-size: 1.15rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .data-dept-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .data-flow-note {
+            max-width: 900px;
+            margin: 3rem auto 0;
+            text-align: center;
+            padding: 2rem;
+            background: rgba(124, 58, 237, 0.08);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 12px;
+        }
+
+        .data-flow-note p {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin: 0;
+        }
+
+        /* Civic Score Index */
+        .score-wrap {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .score-wrap {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .score-copy h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .score-copy p {
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+            font-size: 1.05rem;
+        }
+
+        .score-pill-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .score-pill {
+            background: rgba(245, 166, 35, 0.12);
+            border: 1px solid rgba(245, 166, 35, 0.4);
+            color: var(--gold);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .leaderboard-card {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.9), rgba(26, 31, 58, 0.6));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .leaderboard-card .lb-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .leaderboard-card .lb-title span:first-child {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 1.05rem;
+        }
+
+        .lb-badge {
+            background: var(--secondary);
+            color: var(--dark);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        .lb-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .lb-row:last-child {
+            border-bottom: none;
+        }
+
+        .lb-rank {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+
+        .lb-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0, 217, 255, 0.12);
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .lb-row:first-child .lb-num {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .lb-ward {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .lb-meta {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .lb-score {
+            color: var(--secondary);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Work Systems / Consultancy section */
+        .consult-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 3rem;
+        }
+
+        .project-strip {
+            max-width: 1400px;
+            margin: 3rem auto 0;
+        }
+
+        .project-strip-inner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 1.75rem;
+        }
+
+        .project-card .proj-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--dark);
+            background: var(--secondary);
+            padding: 0.25rem 0.65rem;
+            border-radius: 8px;
+            margin-bottom: 0.85rem;
+        }
+
+        .project-card h4 {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .project-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin: 0;
+        }
+
+        .best-fit-box {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .best-fit-box.esri {
+            background: rgba(0, 102, 255, 0.1);
+            border-left: 3px solid var(--primary);
+        }
+
+        .best-fit-box.janvaani {
+            background: rgba(0, 217, 255, 0.1);
+            border-left: 3px solid var(--secondary);
+        }
+
+        .best-fit-box.open {
+            background: rgba(124, 58, 237, 0.1);
+            border-left: 3px solid var(--accent);
+        }
+
+        .best-fit-box strong {
+            color: var(--secondary);
+        }
+
+        .best-fit-box p {
+            margin: 0.5rem 0 0 0;
+            color: var(--text-muted);
+        }
+
+        .consult-summary {
+            max-width: 900px;
+            margin: 3rem auto 0;
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .consult-summary p {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin: 0;
+        }
+
+        /* Technology Section */
+        .technology {
+            padding: 6rem 2rem;
+            background: var(--dark-light);
+        }
+
+        .tech-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .tech-item {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+
+        .tech-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-5px);
+        }
+
+        .tech-item h4 {
+            margin-top: 1rem;
+            color: var(--text);
+        }
+
+        /* Logo Carousel */
+        .logo-carousel {
+            overflow: hidden;
+            padding: 3rem 0;
+            background: rgba(0, 0, 0, 0.2);
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .logo-carousel::before,
+        .logo-carousel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 200px;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .logo-carousel::before {
+            left: 0;
+            background: linear-gradient(to right, var(--dark-light), transparent);
+        }
+
+        .logo-carousel::after {
+            right: 0;
+            background: linear-gradient(to left, var(--dark-light), transparent);
+        }
+
+        .logo-track {
+            display: flex;
+            gap: 4rem;
+            animation: scroll 30s linear infinite;
+            width: fit-content;
+        }
+
+        .logo-carousel:hover .logo-track {
+            animation-play-state: paused;
+        }
+
+        .logo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 150px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .logo-item:hover {
+            opacity: 1;
+        }
+
+        .logo-item img {
+            height: 60px;
+            width: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+        }
+
+        .logo-item span {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, var(--primary-dark), var(--accent));
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 2rem;
+        }
+
+        .cta-section .btn-primary {
+            background: white;
+            color: var(--primary);
+        }
+
+        .cta-section .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-section a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--secondary);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .solutions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Demo Request Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 14, 39, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--dark-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            max-width: 480px;
+            width: 100%;
+            padding: 2.5rem;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+        }
+
+        .modal-box h3 {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .modal-submit {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .modal-status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+        }
+
+        .modal-status.success {
+            display: block;
+            color: #4ADE80;
+        }
+
+        .modal-status.error {
+            display: block;
+            color: #F87171;
+        }
+
+        .modal-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">BhumiIntel</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#janvaani">JanVaani</a></li>
+                <li><a href="#data-layer">For Departments</a></li>
+                <li><a href="#civic-score">Civic Score</a></li>
+                <li><a href="#solutions">Solutions</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+            </ul>
+            <a href="#demo" class="cta-button">Request Demo</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <canvas id="globe-canvas"></canvas>
+        <div class="hero-content">
+            <div class="hero-tag">Built for Cities, Towns &amp; Villages</div>
+            <h1>Earth Intelligence for the Real World</h1>
+            <p class="hero-subtitle">BhumiIntel turns everyday civic reports into structured spatial intelligence &mdash; giving citizens a voice, civic bodies a dashboard, and government departments a data layer they have never had before. Built for every tier of local governance, from large municipal corporations to small town councils.</p>
+            <div class="hero-buttons">
+                <a href="#janvaani" class="btn-primary">Explore JanVaani</a>
+                <a href="#demo" class="btn-secondary">Schedule Demo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- JanVaani: Engagement Layer -->
+    <section class="solutions" id="janvaani">
+        <div class="section-header">
+            <div class="section-tag">Step 1 &middot; The Engagement Layer</div>
+            <h2 class="section-title">JanVaani</h2>
+            <p class="section-description">Every civic problem starts on the ground &mdash; with a resident who notices it and a local representative who has to respond, whether in a city ward or a village council. JanVaani turns that everyday moment into structured, geospatial, AI-classified data &mdash; the raw signal that powers everything a council or department does next.</p>
+        </div>
+        <div class="solutions-grid">
+            <div class="solution-card">
+                <div class="solution-icon-row">
+                    <div class="solution-icon-emoji">📍</div>
+                    <h3>Citizen Reporting</h3>
+                </div>
+                <span class="card-kicker">The Sensing Layer</span>
+                <p>One tap, anywhere &mdash; call, WhatsApp, or app. No address typing, no category guessing.</p>
+                <ul class="solution-features">
+                    <li>GPS + photo auto-snapped to the exact road, drain, or asset in our spatial graph</li>
+                    <li>Computer vision classifies the issue automatically &mdash; pothole, leakage, outage, encroachment</li>
+                    <li>Live status tracking from report to resolution, visible to the resident</li>
+                    <li>Public proof &mdash; every resolved issue is photographed, geotagged, and dated</li>
+                </ul>
+                <a href="#" class="learn-more">Learn More &rarr;</a>
+            </div>
+
+            <div class="solution-card">
+                <div class="solution-icon-row">
+                    <div class="solution-icon-emoji">🗺️</div>
+                    <h3>Jan-Vikas Control Room</h3>
+                </div>
+                <span class="card-kicker">Integrated Command &amp; Control Centre (ICCC)</span>
+                <p>A live spatial console for the ward or panchayat &mdash; not an inbox of complaints.</p>
+                <ul class="solution-features">
+                    <li>Every open issue plotted on a live map, auto-clustered by location and severity</li>
+                    <li>Scattered reports recognised as one underlying problem, not separate tickets</li>
+                    <li>Crew and contractor dispatch directly from the map</li>
+                    <li>Task prioritisation and resource allocation based on real-time ground demand</li>
+                    <li>Raw data turned into actionable insight, backed by photographic ground proof</li>
+                    <li>Auto-generated, AI-written &ldquo;State of the Area&rdquo; report &mdash; a real geospatial document, not a spreadsheet</li>
+                </ul>
+                <a href="#" class="learn-more">Learn More &rarr;</a>
+            </div>
+        </div>
+        <div class="data-flow-note" style="margin-top: 3rem;">
+            <p>Every report, confirmation, and resolution becomes a labelled, geotagged data point &mdash; the ground-truth layer that the department-level platform below runs on.</p>
+        </div>
+    </section>
+
+    <!-- JanVaani: Intelligence Layer (the platform departments integrate) -->
+    <section class="solutions solutions-alt" id="data-layer">
+        <div class="section-header">
+            <div class="section-tag">Step 2 &middot; The Intelligence Layer</div>
+            <h2 class="section-title">JanVaani for Departments</h2>
+            <p class="section-description">This is what a municipality, utility, or state department actually adopts &mdash; not a report, a system. JanVaani integrates into how the department already plans budgets, dispatches crews, and tracks performance, turning citizen and field data into the decisions departments make every day.</p>
+        </div>
+        <div class="solutions-grid">
+            <div class="solution-card">
+                <div class="solution-icon-row">
+                    <div class="solution-icon-emoji">🏢</div>
+                    <h3>Department Command Layer</h3>
+                </div>
+                <span class="card-kicker">Integrated Into Daily Operations</span>
+                <p>Civic intelligence built into the department&rsquo;s actual workflow, not a separate dashboard to check.</p>
+                <ul class="solution-features">
+                    <li>Ward-to-city hotspot mapping with auto-prioritisation by severity and recurrence</li>
+                    <li>Infrastructure risk scoring &mdash; every road, drain, or pole carries a live-updating risk score</li>
+                    <li>Contractor performance analytics and automated escalation ladders</li>
+                    <li>Budget-to-outcome correlation, mapped by zone &mdash; see where spend does and doesn&rsquo;t translate to results</li>
+                    <li>Audit-ready, compliance-ready records for every decision made on the platform</li>
+                </ul>
+                <a href="#" class="learn-more">Learn More &rarr;</a>
+            </div>
+
+            <div class="solution-card">
+                <div class="solution-icon-row">
+                    <div class="solution-icon-emoji">⚡</div>
+                    <h3>Utility &amp; Grid Operations</h3>
+                </div>
+                <span class="card-kicker">Built for Utility Departments</span>
+                <p>The same spatial intelligence engine, tuned for utility-specific operational decisions.</p>
+                <ul class="solution-features">
+                    <li>Outage response &mdash; cluster outage reports against grid topology to predict cascading failure zones</li>
+                    <li>Solar connection tracking &mdash; geotagged application-to-installation pipeline, ward by ward</li>
+                    <li>Leakage and pipeline failure clustering for water utilities</li>
+                    <li>Crew allocation by demand density and travel time, not static zone assignments</li>
+                </ul>
+                <a href="#" class="learn-more">Learn More &rarr;</a>
+            </div>
+        </div>
+
+        <div class="data-grid">
+            <div class="data-dept-card">
+                <div class="dept-icon">🚰</div>
+                <h4>Water Department</h4>
+                <p>Leakage clusters, pipeline failure frequency, ward-wise complaint density.</p>
+            </div>
+            <div class="data-dept-card">
+                <div class="dept-icon">⚡</div>
+                <h4>Electricity Utility</h4>
+                <p>Outage reports, transformer stress signals, illegal connection patterns.</p>
+            </div>
+            <div class="data-dept-card">
+                <div class="dept-icon">🛣️</div>
+                <h4>Roads &amp; PWD</h4>
+                <p>Pothole density by stretch, road damage frequency, repeat-failure segments.</p>
+            </div>
+            <div class="data-dept-card">
+                <div class="dept-icon">🚓</div>
+                <h4>Police (Crime)</h4>
+                <p>Crime hotspot overlays, accident-prone zones, illegal encroachment signals.</p>
+            </div>
+            <div class="data-dept-card">
+                <div class="dept-icon">📰</div>
+                <h4>Journalists</h4>
+                <p>Embeddable ward heatmaps and verified before/after evidence for local coverage.</p>
+            </div>
+            <div class="data-dept-card">
+                <div class="dept-icon">🏢</div>
+                <h4>State &amp; National Govt</h4>
+                <p>Cross-city performance benchmarking and policy-grade civic intelligence.</p>
+            </div>
+            <div class="data-dept-card">
+                <div class="dept-icon">🗳️</div>
+                <h4>Election Campaigns</h4>
+                <p>Ward-level sentiment and issue-density data to guide outreach and messaging.</p>
+            </div>
+            <div class="data-dept-card">
+                <div class="dept-icon">📋</div>
+                <h4>Electoral CV</h4>
+                <p>A verifiable, public record of resolved civic work &mdash; a representative&rsquo;s real track record.</p>
+            </div>
+        </div>
+        <div class="data-flow-note">
+            <p>The longer a department runs on JanVaani, the smarter the platform gets &mdash; every decision adds to a spatial intelligence layer no spreadsheet or siloed system can replicate.</p>
+        </div>
+    </section>
+
+    <!-- Civic Score Index Section -->
+    <section class="solutions" id="civic-score">
+        <div class="section-header">
+            <div class="section-tag">Gamifying Accountability &middot; Concept Preview</div>
+            <h2 class="section-title">JanVaani Civic Score Index</h2>
+            <p class="section-description">A live, ward-wise and city-wise leaderboard that scores civic performance &mdash; combining citizen participation and civic body responsiveness into a single, comparable number. <em>Illustrative concept &mdash; in development.</em></p>
+        </div>
+        <div class="score-wrap">
+            <div class="score-copy">
+                <h3>One score. Two sides of the story.</h3>
+                <p>The Civic Score Index blends citizen engagement &mdash; reports filed, confirmations, active reporters per ward &mdash; with civic body performance &mdash; resolution speed, SLA adherence, before/after evidence rate. Wards compete against wards. Cities compete against cities.</p>
+                <p>This is not a vanity metric. A rising score is visible proof of governance improving. A falling score is public pressure that no press release can hide from.</p>
+                <div class="score-pill-row">
+                    <span class="score-pill">Ward-wise ranking</span>
+                    <span class="score-pill">City-wise ranking</span>
+                    <span class="score-pill">Citizen participation weight</span>
+                    <span class="score-pill">Civic body responsiveness weight</span>
+                </div>
+            </div>
+            <div class="leaderboard-card">
+                <div style="text-align:center; margin-bottom: 1rem;">
+                    <span style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 0.3rem 0.8rem; border-radius: 10px;">Sample data &middot; for demo purposes</span>
+                </div>
+                <div class="lb-title">
+                    <span>City Civic Score &mdash; Demo</span>
+                    <span class="lb-badge">Sample</span>
+                </div>
+                <div class="lb-row">
+                    <div class="lb-rank">
+                        <div class="lb-num">1</div>
+                        <div>
+                            <div class="lb-ward">Ward 14, Sector East</div>
+                            <div class="lb-meta">412 reports &middot; 91% resolved</div>
+                        </div>
+                    </div>
+                    <div class="lb-score">94.2</div>
+                </div>
+                <div class="lb-row">
+                    <div class="lb-rank">
+                        <div class="lb-num">2</div>
+                        <div>
+                            <div class="lb-ward">Ward 7, Riverside</div>
+                            <div class="lb-meta">365 reports &middot; 87% resolved</div>
+                        </div>
+                    </div>
+                    <div class="lb-score">89.6</div>
+                </div>
+                <div class="lb-row">
+                    <div class="lb-rank">
+                        <div class="lb-num">3</div>
+                        <div>
+                            <div class="lb-ward">Ward 22, Old Town</div>
+                            <div class="lb-meta">298 reports &middot; 83% resolved</div>
+                        </div>
+                    </div>
+                    <div class="lb-score">85.1</div>
+                </div>
+                <div class="lb-row">
+                    <div class="lb-rank">
+                        <div class="lb-num">4</div>
+                        <div>
+                            <div class="lb-ward">Ward 3, Station Road</div>
+                            <div class="lb-meta">274 reports &middot; 79% resolved</div>
+                        </div>
+                    </div>
+                    <div class="lb-score">81.4</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solutions / Consultancy Section -->
+    <section class="solutions solutions-alt" id="solutions">
+        <div class="section-header">
+            <div class="section-tag">Already Running Operations? We Meet You There.</div>
+            <h2 class="section-title">Geospatial Consultancy</h2>
+            <p class="section-description">Not every department is starting from zero. Many already run resource management, asset registers, or field surveys &mdash; just on Excel sheets and non-geotagged systems. We build the spatial layer into what already exists, on our own stack or on ESRI if that&rsquo;s your institutional standard.</p>
+        </div>
+        <div class="consult-grid">
+            <div class="solution-card" style="height: auto;">
+                <div class="solution-icon-row">
+                    <div class="solution-icon-emoji">🧭</div>
+                    <h3>Built on JanVaani</h3>
+                </div>
+                <p>For departments without an existing GIS investment &mdash; we bring our own spatial intelligence stack to your operations, whether or not citizen reporting is part of the scope.</p>
+                <h4 style="color: var(--secondary); margin-top: 1rem; margin-bottom: 0.85rem; font-size: 1.05rem;">Key Capabilities</h4>
+                <ul class="solution-features">
+                    <li>Geotag existing Excel-based asset and resource registers</li>
+                    <li>Field survey digitisation &mdash; condition surveys, resource mapping, infrastructure audits</li>
+                    <li>Localised spatial base layers and region-aware classification</li>
+                    <li>Fast deployment cycle &mdash; weeks, not quarters</li>
+                    <li>Optionally extend into citizen reporting and dept dashboards later</li>
+                </ul>
+                <div class="best-fit-box janvaani">
+                    <strong>Best Fit:</strong>
+                    <p>Departments and bodies with no existing GIS platform who need their operations made spatial, fast.</p>
+                </div>
+            </div>
+
+            <div class="solution-card" style="height: auto;">
+                <div class="solution-icon-row">
+                    <div class="solution-icon-emoji">🗺️</div>
+                    <h3>ESRI / ArcGIS Platform Solutions</h3>
+                </div>
+                <p>We design and build GIS and GeoAI solutions on the ESRI ecosystem for organisations that rely on ArcGIS as their enterprise GIS platform &mdash; aligned with ESRI best practices and integrated seamlessly with existing ArcGIS environments.</p>
+                <h4 style="color: var(--secondary); margin-top: 1rem; margin-bottom: 0.85rem; font-size: 1.05rem;">Key Capabilities</h4>
+                <ul class="solution-features">
+                    <li>Development on ArcGIS Enterprise and ArcGIS Online</li>
+                    <li>Web GIS applications, dashboards, and spatial portals</li>
+                    <li>GeoAI-driven asset condition surveys and predictive scoring</li>
+                    <li>Integration with existing ESRI workflows and data models</li>
+                    <li>Secure, role-based access and enterprise governance</li>
+                </ul>
+                <div class="best-fit-box open">
+                    <strong>Best Fit:</strong>
+                    <p>Organisations already invested in ESRI products that need enterprise-grade GIS, custom workflows, or broader geospatial consultancy beyond civic reporting.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-strip">
+            <div class="section-header" style="margin-bottom: 2rem;">
+                <h3 style="font-size: 1.4rem; color: var(--text); font-weight: 700;">Representative Geospatial Services</h3>
+                <p class="section-description" style="font-size: 1rem; margin-top: 0.5rem;">A sample of the consultancy categories we deliver on ESRI or open-source stacks &mdash; each engagement scoped to the client&rsquo;s specific need.</p>
+            </div>
+            <div class="project-strip-inner">
+                <div class="project-card">
+                    <span class="proj-tag">GeoAI &middot; Asset Surveys</span>
+                    <h4>Asset Condition Surveys</h4>
+                    <p>E.g. GeoAI-driven inspection workflows to assess and score infrastructure condition at scale.</p>
+                </div>
+                <div class="project-card">
+                    <span class="proj-tag">Field Data &middot; Geotagging</span>
+                    <h4>Asset &amp; Geotagging Surveys</h4>
+                    <p>E.g. field-verified, geotagged asset registers for utilities and municipal infrastructure.</p>
+                </div>
+                <div class="project-card">
+                    <span class="proj-tag">GeoAI &middot; Hazard Mapping</span>
+                    <h4>Waterlogging Identification</h4>
+                    <p>E.g. terrain and drainage-aware models that flag waterlogging-prone zones before the monsoon.</p>
+                </div>
+                <div class="project-card">
+                    <span class="proj-tag">Environmental &middot; Surveys</span>
+                    <h4>Ecological Surveys</h4>
+                    <p>E.g. vegetation, water body, and biodiversity mapping to support environmental clearances.</p>
+                </div>
+                <div class="project-card">
+                    <span class="proj-tag">Risk &middot; Clash Detection</span>
+                    <h4>Infra&ndash;Ecology Clash Detection</h4>
+                    <p>E.g. overlaying planned infrastructure against ecological zones to flag conflicts before construction.</p>
+                </div>
+                <div class="project-card">
+                    <span class="proj-tag">GeoAI &middot; Workforce Planning</span>
+                    <h4>Resource Allocation Across Regions</h4>
+                    <p>E.g. spatial optimisation for field-crew deployment based on demand density and travel time.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="consult-summary">
+            <p>These are representative categories &mdash; whether you need a JanVaani deployment or a custom ESRI build, we scope the engagement to your specific spatial problem.</p>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section class="technology">
+        <div class="section-header">
+            <div class="section-tag">Technology Stack</div>
+            <h2 class="section-title">Built on Cutting-Edge Geospatial Technology</h2>
+        </div>
+
+        <!-- Logo Carousel -->
+        <div class="logo-carousel">
+            <div class="logo-track">
+                <!-- First set -->
+                <div class="logo-item">
+                    <img src="https://www.esri.com/content/dam/esrisites/en-us/common/icons/product-logos/ArcGIS-Enterprise.png" alt="ArcGIS Enterprise">
+                    <span>ArcGIS Enterprise</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://www.esri.com/content/dam/esrisites/en-us/common/icons/product-logos/ArcGIS-Online.png" alt="ArcGIS Online">
+                    <span>ArcGIS Online</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/QGIS_logo_new.svg" alt="QGIS">
+                    <span>QGIS</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://geoserver.org/img/geoserver-logo.png" alt="GeoServer">
+                    <span>GeoServer</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://cesium.com/images/cesium-logo.png" alt="Cesium">
+                    <span>Cesium</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://wiki.postgresql.org/images/a/a4/PostgreSQL_logo.3colors.svg" alt="PostGIS">
+                    <span>PostGIS</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://sedona.apache.org/latest/image/sedona_logo.png" alt="Apache Sedona">
+                    <span>Apache Sedona</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://www.databricks.com/sites/default/files/2021-10/db-nav-logo.svg" alt="Databricks">
+                    <span>Databricks</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://spark.apache.org/images/spark-logo-trademark.png" alt="Apache Spark">
+                    <span>Apache Spark</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://kafka.apache.org/logos/kafka_logo--simple.png" alt="Apache Kafka">
+                    <span>Apache Kafka</span>
+                </div>
+                <!-- Duplicate set for seamless loop -->
+                <div class="logo-item">
+                    <img src="https://www.esri.com/content/dam/esrisites/en-us/common/icons/product-logos/ArcGIS-Enterprise.png" alt="ArcGIS Enterprise">
+                    <span>ArcGIS Enterprise</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://www.esri.com/content/dam/esrisites/en-us/common/icons/product-logos/ArcGIS-Online.png" alt="ArcGIS Online">
+                    <span>ArcGIS Online</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/QGIS_logo_new.svg" alt="QGIS">
+                    <span>QGIS</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://geoserver.org/img/geoserver-logo.png" alt="GeoServer">
+                    <span>GeoServer</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://cesium.com/images/cesium-logo.png" alt="Cesium">
+                    <span>Cesium</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://wiki.postgresql.org/images/a/a4/PostgreSQL_logo.3colors.svg" alt="PostGIS">
+                    <span>PostGIS</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://sedona.apache.org/latest/image/sedona_logo.png" alt="Apache Sedona">
+                    <span>Apache Sedona</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://www.databricks.com/sites/default/files/2021-10/db-nav-logo.svg" alt="Databricks">
+                    <span>Databricks</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://spark.apache.org/images/spark-logo-trademark.png" alt="Apache Spark">
+                    <span>Apache Spark</span>
+                </div>
+                <div class="logo-item">
+                    <img src="https://kafka.apache.org/logos/kafka_logo--simple.png" alt="Apache Kafka">
+                    <span>Apache Kafka</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-grid">
+            <div class="tech-item">
+                <h4>Geospatial Clustering &amp; CV</h4>
+            </div>
+            <div class="tech-item">
+                <h4>Satellite Imagery (Optical + SAR)</h4>
+            </div>
+            <div class="tech-item">
+                <h4>WhatsApp &amp; Edge AI Reporting</h4>
+            </div>
+            <div class="tech-item">
+                <h4>Predictive Maintenance Models</h4>
+            </div>
+            <div class="tech-item">
+                <h4>Large-Scale Spatial Compute (Sedona, Spark)</h4>
+            </div>
+            <div class="tech-item">
+                <h4>Cloud &amp; On-Prem Processing</h4>
+            </div>
+            <div class="tech-item">
+                <h4>Audit-Ready Outputs</h4>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="demo">
+        <h2>Ready to Bring Civic Intelligence to Your City?</h2>
+        <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">Join citizens, civic bodies, and departments using BhumiIntel to make every civic decision data-backed.</p>
+        <button type="button" class="btn-primary" onclick="openDemoModal()">Schedule a Demo</button>
+    </section>
+
+    <!-- Demo Request Modal -->
+    <div class="modal-overlay" id="demoModalOverlay" onclick="if(event.target===this) closeDemoModal()">
+        <div class="modal-box">
+            <button type="button" class="modal-close" aria-label="Close" onclick="closeDemoModal()">&times;</button>
+            <h3>Schedule a Demo</h3>
+            <p class="modal-subtitle">Tell us a bit about you and we'll get back to you to set up a time.</p>
+            <form id="demoForm" action="https://formspree.io/f/xpqgwnvj" method="POST">
+                <div class="form-group">
+                    <label for="demoName">Name</label>
+                    <input type="text" id="demoName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="demoEmail">Email</label>
+                    <input type="email" id="demoEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="demoPhone">Phone Number</label>
+                    <input type="tel" id="demoPhone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="demoMessage">Message</label>
+                    <textarea id="demoMessage" name="message" placeholder="Tell us about your city, department, or use case..."></textarea>
+                </div>
+                <input type="hidden" name="_subject" value="New Demo Request - BhumiIntel">
+                <button type="submit" class="btn-primary modal-submit" id="demoSubmitBtn">Send Request</button>
+                <p class="modal-status" id="demoStatus"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>BhumiIntel</h3>
+                <p>Earth Intelligence for the Built World. Making every civic decision informed by accurate, explainable, and scalable earth intelligence.</p>
+            </div>
+            <div class="footer-section">
+                <h3>JanVaani</h3>
+                <ul>
+                    <li><a href="#janvaani">Citizen Reporting</a></li>
+                    <li><a href="#janvaani">Jan-Vikas Control Room</a></li>
+                    <li><a href="#data-layer">For Departments</a></li>
+                    <li><a href="#civic-score">Civic Score Index</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Solutions</h3>
+                <ul>
+                    <li><a href="#solutions">JanVaani Platform Deployment</a></li>
+                    <li><a href="#solutions">ESRI / ArcGIS Consultancy</a></li>
+                    <li><a href="#data-layer">JanVaani for Departments</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Partners</a></li>
+                    <li><a href="#">Case Studies</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul>
+                    <li><a href="mailto:info@bhumiintel.com">info@bhumiintel.com</a></li>
+                    <li><a href="#">LinkedIn</a></li>
+                    <li><a href="#">Twitter</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 BhumiIntel. All rights reserved. | Privacy Policy | Terms of Service</p>
+        </div>
+    </footer>
+
+    <script>
+        // Animated globe background with transitions
+        const canvas = document.getElementById('globe-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        // Create globe
+        const geometry = new THREE.SphereGeometry(5, 64, 64);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0x0066FF,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+        const globe = new THREE.Mesh(geometry, material);
+        scene.add(globe);
+
+        // Add particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 50;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.02,
+            color: 0x00D9FF,
+            transparent: true,
+            opacity: 0.6
+        });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        // Create city-like horizontal structures (buildings)
+        const cityGroup = new THREE.Group();
+        const cityLineGeometry = new THREE.BoxGeometry(1.5, 0.15, 0.15);
+        const cityMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00D9FF,
+            transparent: true,
+            opacity: 0
+        });
+
+        for(let i = 0; i < 100; i++) {
+            const line = new THREE.Mesh(cityLineGeometry, cityMaterial.clone());
+            const phi = Math.acos(-1 + (2 * i) / 100);
+            const theta = Math.sqrt(100 * Math.PI) * phi;
+            const radius = 5.2;
+
+            line.position.x = radius * Math.cos(theta) * Math.sin(phi);
+            line.position.y = radius * Math.sin(theta) * Math.sin(phi);
+            line.position.z = radius * Math.cos(phi);
+
+            // Make buildings lie horizontally on the sphere surface
+            line.lookAt(0, 0, 0);
+
+            cityGroup.add(line);
+        }
+        scene.add(cityGroup);
+
+        // Create grid pattern for land parcels
+        const landGroup = new THREE.Group();
+        const landGeometry = new THREE.PlaneGeometry(1, 1);
+        const landMaterial = new THREE.MeshBasicMaterial({
+            color: 0x7C3AED,
+            wireframe: true,
+            transparent: true,
+            opacity: 0,
+            side: THREE.DoubleSide
+        });
+
+        for(let i = 0; i < 80; i++) {
+            const plane = new THREE.Mesh(landGeometry, landMaterial.clone());
+            const phi = Math.acos(-1 + (2 * i) / 80);
+            const theta = Math.sqrt(80 * Math.PI) * phi;
+            const radius = 5.3;
+
+            plane.position.x = radius * Math.cos(theta) * Math.sin(phi);
+            plane.position.y = radius * Math.sin(theta) * Math.sin(phi);
+            plane.position.z = radius * Math.cos(phi);
+
+            plane.lookAt(0, 0, 0);
+            landGroup.add(plane);
+        }
+        scene.add(landGroup);
+
+        camera.position.z = 15;
+
+        // Animation states
+        let currentState = 0;
+        let transitionProgress = 0;
+        const stateDuration = 4000; // 4 seconds per state
+        let lastStateChange = Date.now();
+
+        // States: 0 = Earth, 1 = City, 2 = Land
+        function updateVisualization() {
+            const now = Date.now();
+            const elapsed = now - lastStateChange;
+
+            if (elapsed > stateDuration) {
+                currentState = (currentState + 1) % 3;
+                lastStateChange = now;
+                transitionProgress = 0;
+            } else {
+                transitionProgress = elapsed / stateDuration;
+            }
+
+            // Smooth transition using easing
+            const easeProgress = transitionProgress < 0.5
+                ? 2 * transitionProgress * transitionProgress
+                : 1 - Math.pow(-2 * transitionProgress + 2, 2) / 2;
+
+            // State 0: Earth (Globe + Particles)
+            if (currentState === 0) {
+                globe.material.opacity = 0.3 * (1 - easeProgress);
+                particlesMesh.material.opacity = 0.6 * (1 - easeProgress);
+                cityGroup.children.forEach(line => line.material.opacity = 0);
+                landGroup.children.forEach(plane => plane.material.opacity = 0);
+
+                // Transition to city
+                if (easeProgress > 0.5) {
+                    cityGroup.children.forEach(line => {
+                        line.material.opacity = (easeProgress - 0.5) * 2 * 0.4;
+                    });
+                }
+            }
+
+            // State 1: City
+            else if (currentState === 1) {
+                globe.material.opacity = 0;
+                particlesMesh.material.opacity = 0.3;
+                cityGroup.children.forEach(line => {
+                    line.material.opacity = 0.4 * (1 - easeProgress);
+                });
+                landGroup.children.forEach(plane => plane.material.opacity = 0);
+
+                // Transition to land
+                if (easeProgress > 0.5) {
+                    landGroup.children.forEach(plane => {
+                        plane.material.opacity = (easeProgress - 0.5) * 2 * 0.3;
+                    });
+                }
+            }
+
+            // State 2: Land
+            else if (currentState === 2) {
+                globe.material.opacity = 0;
+                particlesMesh.material.opacity = 0.3;
+                cityGroup.children.forEach(line => line.material.opacity = 0);
+                landGroup.children.forEach(plane => {
+                    plane.material.opacity = 0.3 * (1 - easeProgress);
+                });
+
+                // Transition back to earth
+                if (easeProgress > 0.5) {
+                    globe.material.opacity = (easeProgress - 0.5) * 2 * 0.3;
+                    particlesMesh.material.opacity = 0.3 + (easeProgress - 0.5) * 2 * 0.3;
+                }
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            globe.rotation.y += 0.001;
+            globe.rotation.x += 0.0005;
+            particlesMesh.rotation.y += 0.0005;
+            cityGroup.rotation.y += 0.001;
+            landGroup.rotation.y += 0.001;
+
+            updateVisualization();
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Demo Request Modal
+        function openDemoModal() {
+            document.getElementById('demoModalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDemoModal() {
+            document.getElementById('demoModalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDemoModal();
+        });
+
+        const demoForm = document.getElementById('demoForm');
+        const demoStatus = document.getElementById('demoStatus');
+        const demoSubmitBtn = document.getElementById('demoSubmitBtn');
+
+        demoForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            demoSubmitBtn.disabled = true;
+            demoSubmitBtn.textContent = 'Sending...';
+            demoStatus.className = 'modal-status';
+            demoStatus.textContent = '';
+
+            try {
+                const response = await fetch(demoForm.action, {
+                    method: 'POST',
+                    body: new FormData(demoForm),
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (response.ok) {
+                    demoStatus.textContent = "Thanks! We've received your request and will be in touch shortly.";
+                    demoStatus.className = 'modal-status success';
+                    demoForm.reset();
+                    setTimeout(closeDemoModal, 2500);
+                } else {
+                    throw new Error('Submission failed');
+                }
+            } catch (err) {
+                demoStatus.textContent = 'Something went wrong. Please email us directly at info@bhumiintel.com.';
+                demoStatus.className = 'modal-status error';
+            } finally {
+                demoSubmitBtn.disabled = false;
+                demoSubmitBtn.textContent = 'Send Request';
+            }
+        });
+    </script>
+</body>
+</html>
